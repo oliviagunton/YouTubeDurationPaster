@@ -26,3 +26,10 @@ chrome.contextMenus.onClicked.addListener(function(info, tab){
 		clickHandler();
 	}
 });
+
+//Keyboard shortcut (default = Ctrl + /)
+chrome.commands.onCommand.addListener(function(command){
+	if (command == "paste_duration"){
+		alert ("Command recognized");
+	}
+});

@@ -3,13 +3,23 @@
 
   "background": {
       "page": "background.html",
-      "persistent": false
+      "persistent": true
   },
 
   "browser_action": {
       "default_icon": "iconv2-64.png",
       "default_popup": "popup.html",
       "default_title": "YouTube Duration Paster"
+  },
+
+  "commands": {
+    "CSY": {
+      "description": "Paste YouTube duration",
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
+      }
+    }
   },
 
   "description": "Paste html-formatted YouTube links showing title and duration",
