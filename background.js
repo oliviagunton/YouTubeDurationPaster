@@ -5,9 +5,24 @@ function clickHandler(){
 	alert("hello");
 }
 
-chrome.contextMenus.create({
-    "title": "YouTube Duration Paster",
-    "contexts": ["page", "selection"],
-    "onclick" : clickHandler
+function setupContextMenu(){
+	chrome.contextMenus.create({
+    	"title": "Paste YouTube duration",
+    	"id": "YDP",
+    	"contexts": ["page", "selection"],
+	});
+}
+
+//Set up context menu when extension is installed or updated
+//http://stackoverflow.com/a/26246735
+chrome.runtime.onInstalled.addListener(function(){
+	setupContextMenu();
 });
 
+//Listen for clicks on our menu item
+//https://developer.chrome.com/extensions/event_pages#best-practices
+chrome.contextMenus.onClicked.addListener(function(info, tab){
+	if(info.menuItemId === "YDP"){
+		clickHandler();
+	}
+});
