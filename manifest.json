@@ -12,6 +12,20 @@
       "default_title": "YouTube Duration Paster"
   },
 
+  "content_scripts": [
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "js": [
+                "contentscript.js"
+            ],
+            "run_at": "document_end",
+            "all_frames": false
+        }
+  ],
+
   "description": "Paste html-formatted YouTube links showing title and duration",
 
   "icons": {

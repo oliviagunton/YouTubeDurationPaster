@@ -21,6 +21,16 @@ function IS08601DurationToSeconds(duration) {
 	return totalSeconds;
 }
 
+//Source: https://gist.github.com/srsudar/e9a41228f06f32f272a2
+function sendPasteToContentScript(toBePasted) {
+    // We first need to find the active tab and window and then send the data
+    // along. This is based on:
+    // https://developer.chrome.com/extensions/messaging
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {data: toBePasted});
+    });
+}
+
 //Adapted from http://www.html5rocks.com/en/tutorials/es6/promises/
 function getVideoInfo(videoID) {
 	var apiKey = "AIzaSyCZQn2nvBk0XOBZtfLsKx7KjiEATuqlhK8";
@@ -114,6 +124,7 @@ function pasteLink(){
 
 		getVideoInfo(videoID).then(function(response) {
 			  console.log("Success!", response);
+			  sendPasteToContentScript(response); //TODO: parse JSON
 			}, function(error) {
 			  console.error("Failed!", error);
 		});
@@ -128,7 +139,7 @@ function setupContextMenu(){
 	chrome.contextMenus.create({
     	"title": "Paste with YouTube duration(s)",
     	"id": "YDP",
-    	"contexts": ["page", "selection"],
+    	"contexts": ["editable"],
 	});
 }
 
