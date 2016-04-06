@@ -29,6 +29,7 @@
       "background",
       "clipboardRead",
       "contextMenus",
+      "http://www.googleapis.com/*", //YouTube API
       "https://www.googleapis.com/*", //YouTube API
       "tabs"
 

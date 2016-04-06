@@ -1,26 +1,61 @@
 //YouTube Duration Paster
 //background.js: scripts for non-persistent background page ((context menu functionality, interaction with clipboard)
 
-function pasteLink(){
-	// Modified from http://stackoverflow.com/questions/2964678/jquery-youtube-url-validation-with-regex
-	var ytregex = /^https?:\/\/(?:www\.)?youtube.com\/watch\?(?=.*v=\w+)(?:\S+)?$/;
-	var text = getClipboardText();
-	var URLmatch = text.match(ytregex);
+// Adapted from "YouTube video length" extension (utils.js)
+// https://chrome.google.com/webstore/detail/youtube-video-length/lfkbfhglojdeoebdkpmgmphplhanchff
+function IS08601DurationToSeconds(duration) {
+	var seconds = duration.match(/(\d*)S/);
+	seconds = parseInt(seconds ? (parseInt(seconds[1]) ? seconds[1] : 0) : 0);
 
-	if(URLmatch){
-		alert("Matched!");
-	}else{
-		alert("Please copy a valid YouTube video URL to the clipboard first.\nYou copied: " + text);
-	}
-	//alert(text);
+	var minutes = duration.match(/(\d*)M/);
+	minutes = parseInt(minutes ? (parseInt(minutes[1]) ? minutes[1] : 0) : 0);
+
+	var hours = duration.match(/(\d*)H/);
+	hours = parseInt(hours ? (parseInt(hours[1]) ? hours[1] : 0) : 0);
+
+	var totalSeconds = 
+		(hours * 60 * 60) +
+		(minutes * 60) +
+		seconds;
+
+	return totalSeconds;
 }
 
-function setupContextMenu(){
-	chrome.contextMenus.create({
-    	"title": "Paste with YouTube duration(s)",
-    	"id": "YDP",
-    	"contexts": ["page", "selection"],
-	});
+//Adapted from http://www.html5rocks.com/en/tutorials/es6/promises/
+function getVideoInfo(videoID) {
+	var apiKey = "AIzaSyCZQn2nvBk0XOBZtfLsKx7KjiEATuqlhK8";
+
+	var apiURL = "https://www.googleapis.com/youtube/v3/videos"
+	+ "?part=contentDetails,snippet"
+	+ "&fields=items/contentDetails/duration,items/snippet/title"
+	+ "&id=" + videoID
+	+ "&key=" + apiKey;
+
+  	return new Promise(function(resolve, reject) {
+
+    	var req = new XMLHttpRequest();
+    	req.open('GET', apiURL);
+
+	    req.onload = function() {
+	      if (req.status == 200) {
+	        // Resolve the promise with the response text
+	        resolve(req.response);
+	      }
+	      else {
+	        // Otherwise reject with the status text
+	        // which will hopefully be a meaningful error
+	        reject(Error(req.statusText));
+	      }
+	    };
+
+	    // Handle network errors
+	    req.onerror = function() {
+	      reject(Error("Network Error"));
+	    };
+
+	    // Make the request
+	    req.send();
+  	});
 }
 
 // getClipboardText - return any text that is currently on the clipboard
@@ -60,6 +95,41 @@ function getClipboardText() {
 
     // return the text
     return clipboardText;
+}
+
+function pasteLink(){
+	var clipboardtext = getClipboardText();
+
+	// source: http://stackoverflow.com/questions/2964678/jquery-youtube-url-validation-with-regex
+	var ytregex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+	
+	var URLmatch = clipboardtext.match(ytregex);
+
+	if(URLmatch){
+		//alert(URLmatch[1]);
+
+		var videoID = URLmatch[1];
+
+		console.log(videoID);
+
+		getVideoInfo(videoID).then(function(response) {
+			  console.log("Success!", response);
+			}, function(error) {
+			  console.error("Failed!", error);
+		});
+
+	}else{
+		alert("Please copy a valid YouTube video URL to the clipboard first.\n\nYou copied:\n" + clipboardtext);
+	}
+
+}
+
+function setupContextMenu(){
+	chrome.contextMenus.create({
+    	"title": "Paste with YouTube duration(s)",
+    	"id": "YDP",
+    	"contexts": ["page", "selection"],
+	});
 }
 
 //Set up context menu when extension is installed or updated
