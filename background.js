@@ -1,3 +1,5 @@
+'use strict';
+
 //YouTube Duration Paster
 //background.js: scripts for non-persistent background page ((context menu functionality, interaction with clipboard)
 
@@ -28,6 +30,7 @@ function sendPasteToContentScript(toBePasted) {
     // https://developer.chrome.com/extensions/messaging
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {data: toBePasted});
+        //alert(tabs[0].id);
     });
 }
 
@@ -124,7 +127,7 @@ function pasteLink(){
 
 		getVideoInfo(videoID).then(function(response) {
 			  console.log("Success!", response);
-			  sendPasteToContentScript(response); //TODO: parse JSON
+			  sendPasteToContentScript("woohoo"); //TODO: parse JSON in response
 			}, function(error) {
 			  console.error("Failed!", error);
 		});

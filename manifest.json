@@ -3,7 +3,7 @@
 
   "background": {
       "page": "background.html",
-      "persistent": true
+      "persistent": false
   },
 
   "browser_action": {
